@@ -29,6 +29,9 @@ class ViewController: UIViewController {
     let story6 = "You bond with the murderer while crooning verses of \"Can you feel the love tonight\". He drops you off at the next town. Before you go he asks you if you know any good places to dump bodies. You reply: \"Try the pier.\""
     
     
+    let BUTTON_TOP = 1
+    let BUTTON_BOTTOM = 2
+    var currentStory = 1
     // UI Elements linked to the storyboard
     @IBOutlet weak var topButton: UIButton!         // Has TAG = 1
     @IBOutlet weak var bottomButton: UIButton!      // Has TAG = 2
@@ -44,7 +47,7 @@ class ViewController: UIViewController {
         
         
         // TODO Step 3: Set the text for the storyTextView, topButton, bottomButton, and to T1_Story, T1_Ans1, and T1_Ans2
-        
+        initStory()
     }
 
     
@@ -54,12 +57,76 @@ class ViewController: UIViewController {
         // TODO Step 4: Write an IF-Statement to update the views
                 
         // TODO Step 6: Modify the IF-Statement to complete the story
-        
-    
+        let currentAvailableAns = checkButtonAnswer()
+        let userAns = sender.tag == BUTTON_TOP ? currentAvailableAns.anw1 : currentAvailableAns.ans2
+        if storySelection(userAns){
+            showEndAlert()
+        }
     }
     
-
-
-
+    func initStory() {
+        storyTextView.text = story1
+        setButtonTitle(answer1a, answer1b)
+        
+    }
+    
+    func setButtonTitle(_ titleTop: String, _ titleBottom: String) {
+        topButton.setTitle(titleTop, for: UIControlState.normal)
+        bottomButton.setTitle(titleBottom, for: UIControlState.normal)
+    }
+    
+    func checkButtonAnswer() -> (anw1: String, ans2: String) {
+        var ans1: String
+        var ans2: String
+        switch currentStory {
+        case 2:
+            ans1 = "answer2a"
+            ans2 = "answer2b"
+        case 3:
+            ans1 = "answer3a"
+            ans2 = "answer3b"
+        default:
+            ans1 = "answer1a"
+            ans2 = "answer1b"
+        }
+        return(ans1, ans2)
+    }
+    
+    func storySelection(_ answer: String) -> Bool {
+        var storyEnd = false
+        switch answer {
+        case "answer1a", "answer2a":
+            currentStory = 3
+            storyTextView.text = story3
+            setButtonTitle(answer3a, answer3b)
+        case "answer1b":
+            currentStory = 2
+            storyTextView.text = story2
+            setButtonTitle(answer2a, answer2b)
+        case "answer2b":
+            storyTextView.text = story4
+            storyEnd = true
+        case "answer3a":
+            storyTextView.text = story6
+            storyEnd = true
+        case "answer3b":
+            storyTextView.text = story5
+            storyEnd = true
+        default:
+            storyTextView.text = story1
+        }
+        return storyEnd
+    }
+    
+    func showEndAlert() {
+        let alert = UIAlertController(title: "Awesome", message: "Story Ended?", preferredStyle: .alert)
+        
+        let endAction = UIAlertAction(title: "Restart", style: .default , handler: { (UIAlertAction) in
+            self.initStory()
+            self.currentStory = 1
+        })
+        alert.addAction(endAction)
+        present(alert, animated: true, completion: nil)
+    }
 }
 
